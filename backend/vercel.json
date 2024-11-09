@@ -8,7 +8,11 @@
     ],
     "routes": [
       {
-        "src": "/api/(.*)",
+        "src": "/api/users/(.*)",
+        "dest": "backend/server.js"
+      },
+      {
+        "src": "/api/loans/(.*)",
         "dest": "backend/server.js"
       }
     ],
