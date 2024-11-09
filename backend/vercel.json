@@ -11,6 +11,10 @@
         "src": "/api/(.*)",
         "dest": "backend/server.js"
       }
-    ]
-
-}
+    ],
+    "env": {
+      "MONGO_URI": "mongodb+srv://loanapp2024:loanapp$2024@loanapp.mlao8.mongodb.net/?retryWrites=true&w=majority&appName=Loanapp",
+      "JWT_SECRET": "loan$2024"
+    }
+  }
+  
