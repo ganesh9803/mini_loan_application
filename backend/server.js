@@ -1,6 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import cors from 'cors'; // Import the CORS package
+import cors from 'cors';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import loanRoutes from './routes/loanRoutes.js';
@@ -12,7 +12,7 @@ const app = express();
 connectDB();
 
 // Middleware to enable CORS
-app.use(cors()); // Allow all domains (for development purposes)
+app.use(cors());
 
 // Middleware to parse JSON
 app.use(bodyParser.json());
@@ -26,5 +26,5 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Server error', error: err.message });
 });
 
-// Vercel requires us to export the app for serverless functions
+// Export the app to work with serverless functions on Vercel
 export default app;
