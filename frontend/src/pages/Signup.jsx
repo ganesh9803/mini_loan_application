@@ -24,13 +24,11 @@ const SignupForm = () => {
     try {
       const response = await API.post('/users/signup', { username, email, password, role });
       console.log('Signup Response:', response);
-      setMessage(response.data.message);
+      setMessage(response?.data?.message || 'Signup successful');
       // Redirect to login page after successful signup
-      setTimeout(() => {
         navigate('/login');
-      }, 2000);
     } catch (error) {
-      setMessage(error.response.data.message);
+      setMessage(error?.response?.data?.message || 'An error occurred during signup');
     }
   };
 
