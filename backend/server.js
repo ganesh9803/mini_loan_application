@@ -7,6 +7,7 @@ import loanRoutes from './routes/loanRoutes.js';
 import { authenticate } from './middlewares/auth.js';
 
 const app = express();
+const port = process.env.PORT || 5000;
 
 // Connect to DB
 connectDB();
