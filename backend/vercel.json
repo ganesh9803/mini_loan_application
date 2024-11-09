@@ -1,20 +1,19 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "server.js",
-        "use": "@vercel/node"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/api/users/.*",
-        "dest": "server.js"
-      },
-      {
-        "src": "/api/loans/.*",
-        "dest": "server.js"
-      }
-    ]
-  }
-  
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/users/.*",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/api/loans/.*",
+      "dest": "backend/server.js"
+    }
+  ]
+}
