@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import axios from "axios";
 import RepaymentForm from '../components/RepaymentForm';
 
-
 const LoanList = () => {
   const [loans, setLoans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [selectedLoanId, setSelectedLoanId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1); // Track current page
+  const loansPerPage = 5; // Loans per page
 
   useEffect(() => {
     fetchLoans();
@@ -16,8 +17,8 @@ const LoanList = () => {
   const fetchLoans = async () => {
     try {
       const token = localStorage.getItem('token'); // Retrieve the token from localStorage
-        if (!token) throw new Error('No token found')
-      const response = await axios.get(import.meta.env.VITE_BACKEND_URL +'/api/loans/get', {
+      if (!token) throw new Error('No token found');
+      const response = await axios.get(import.meta.env.VITE_BACKEND_URL + '/api/loans/get', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setLoans(response.data);
@@ -32,6 +33,17 @@ const LoanList = () => {
     setSelectedLoanId((prevLoanId) => (prevLoanId === loanId ? null : loanId));
   };
 
+  // Pagination: Slice loans array based on current page
+  const indexOfLastLoan = currentPage * loansPerPage;
+  const indexOfFirstLoan = indexOfLastLoan - loansPerPage;
+  const currentLoans = loans.slice(indexOfFirstLoan, indexOfLastLoan);
+
+  // Handle page change
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Calculate total pages
+  const totalPages = Math.ceil(loans.length / loansPerPage);
+
   return (
     <div className="p-4 md:p-8">
       <h1 className="text-2xl font-bold mb-4 text-center">Your Loan Applications</h1>
@@ -45,7 +57,7 @@ const LoanList = () => {
             <p className="text-center">No loan applications found.</p>
           ) : (
             <div>
-              {loans.map((loan) => (
+              {currentLoans.map((loan) => (
                 <div key={loan._id} className="mb-6 border p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
                   <div onClick={() => toggleLoanDetails(loan._id)} className="cursor-pointer mb-4">
                     <h3 className="text-xl font-semibold">Loan Amount: ₹{loan.amount}</h3>
@@ -88,6 +100,25 @@ const LoanList = () => {
               ))}
             </div>
           )}
+
+          {/* Pagination controls */}
+          <div className="mt-4 flex justify-center">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg mr-2 disabled:opacity-50"
+            >
+              Prev
+            </button>
+            <span className="px-4 py-2">{currentPage} / {totalPages}</span>
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg ml-2 disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
     </div>

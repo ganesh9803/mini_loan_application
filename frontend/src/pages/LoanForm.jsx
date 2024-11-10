@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import axios from "axios";
 
 const LoanForm = () => {
@@ -7,9 +7,37 @@ const LoanForm = () => {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [repaymentSchedule, setRepaymentSchedule] = useState([]);
+  const [isEligible, setIsEligible] = useState(false);
 
-  const calculateDueDates = useCallback(
-    (term) => {
+  useEffect(() => {
+    checkEligibility();
+  }, []);
+
+  const checkEligibility = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('No token found');
+
+      const response = await axios.get(import.meta.env.VITE_BACKEND_URL + '/api/loans/get', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const activeLoans = response.data.filter(
+        (loan) => loan.status === 'PENDING' || loan.status === 'APPROVED'
+      );
+
+      // Set eligibility based on whether the user has fewer than 3 active loans
+      setIsEligible(activeLoans.length < 3);
+      if (activeLoans.length >= 3) {
+        setMessage('You are not eligible for a new loan until one of your existing loans is fully repaid.');
+      }
+    } catch (error) {
+      setMessage(`Error checking eligibility: ${error.message}`);
+    }
+  };
+
+  useEffect(() => {
+    const calculateDueDates = (term) => {
       const today = new Date();
       const schedule = [];
       for (let i = 1; i <= term; i++) {
@@ -18,24 +46,25 @@ const LoanForm = () => {
         schedule.push({ dueDate: dueDate.toLocaleDateString(), amount: (amount / term).toFixed(2) });
       }
       return schedule;
-    },
-    [amount]
-  );
-
-  useEffect(() => {
+    };
+  
     if (amount && term) {
       setRepaymentSchedule(calculateDueDates(term));
     } else {
       setRepaymentSchedule([]);
     }
-  }, [amount, term, calculateDueDates]);
+  }, [amount, term]); // Only include `amount` and `term` as dependencies
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!isEligible) return;
+
     setLoading(true);
     try {
-      const token = localStorage.getItem('token'); // Retrieve the token from localStorage
-      if (!token) throw new Error('No token found')
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('No token found');
+
       const response = await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/loans/add', { amount, term }, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -47,6 +76,7 @@ const LoanForm = () => {
       setMessage(error.response ? error.response.data.message : 'Error occurred while submitting the loan request');
     } finally {
       setLoading(false);
+      checkEligibility(); // Re-check eligibility after submission
     }
   };
 
@@ -67,6 +97,7 @@ const LoanForm = () => {
             onChange={(e) => setAmount(e.target.value)}
             className="border border-gray-300 p-2 w-full mt-1 rounded-md focus:outline-none focus:border-blue-500"
             required
+            disabled={!isEligible} // Disable input if ineligible
           />
         </div>
         <div>
@@ -82,6 +113,7 @@ const LoanForm = () => {
             onChange={(e) => setTerm(e.target.value)}
             className="border border-gray-300 p-2 w-full mt-1 rounded-md focus:outline-none focus:border-blue-500"
             required
+            disabled={!isEligible} // Disable input if ineligible
           />
         </div>
 
@@ -103,7 +135,7 @@ const LoanForm = () => {
           className={`w-full py-2 mt-4 rounded-md ${
             loading ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'
           } text-white font-semibold transition duration-200 ease-in-out`}
-          disabled={loading}
+          disabled={loading || !isEligible} // Disable button if ineligible or loading
         >
           {loading ? 'Processing...' : 'Submit Loan Request'}
         </button>

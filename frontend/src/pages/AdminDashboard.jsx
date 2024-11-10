@@ -7,11 +7,11 @@ const AdminLoanList = () => {
   useEffect(() => {
     const fetchLoans = async () => {
       try {
-        const token = localStorage.getItem('token'); // Retrieve the token from localStorage
-        if (!token) throw new Error('No token found')
-        const response = await axios.get(import.meta.env.VITE_BACKEND_URL +'/api/loans/all',{
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No token found');
+        const response = await axios.get(import.meta.env.VITE_BACKEND_URL + '/api/loans/all', {
           headers: { Authorization: `Bearer ${token}` },
-        }); 
+        });
         console.log('Loans Data:', response.data);
         setLoans(response.data);
       } catch (error) {
@@ -24,15 +24,15 @@ const AdminLoanList = () => {
 
   const approveLoan = async (loanId) => {
     try {
-      const token = localStorage.getItem('token'); // Retrieve the token from localStorage
-        if (!token) throw new Error('No token found')
-          await axios.patch(
-            import.meta.env.VITE_BACKEND_URL + `/api/loans/${loanId}/approve`,
-            {}, // Empty body for PATCH request
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('No token found');
+      await axios.patch(
+        import.meta.env.VITE_BACKEND_URL + `/api/loans/${loanId}/approve`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setLoans(loans.map((loan) => loan._id === loanId ? { ...loan, status: 'APPROVED' } : loan));
     } catch (error) {
       console.error(error.response?.data?.message);
@@ -50,6 +50,7 @@ const AdminLoanList = () => {
           <table className="min-w-full table-auto bg-white rounded-lg shadow-md">
             <thead className="bg-gray-200 text-sm sm:text-base">
               <tr>
+                <th className="px-3 sm:px-4 py-2 border-b">Customer Name</th>
                 <th className="px-3 sm:px-4 py-2 border-b">Amount</th>
                 <th className="px-3 sm:px-4 py-2 border-b">Term (Weeks)</th>
                 <th className="px-3 sm:px-4 py-2 border-b">Status</th>
@@ -59,7 +60,8 @@ const AdminLoanList = () => {
             <tbody>
               {loans.map((loan) => (
                 <tr key={loan._id} className="hover:bg-gray-100">
-                  <td className="px-3 sm:px-4 py-3 border-b text-sm sm:text-base">{loan.amount}</td>
+                  <td className="px-3 sm:px-4 py-3 border-b text-sm sm:text-base">{loan.userId?.username}</td>
+                  <td className="px-3 sm:px-4 py-3 border-b text-sm sm:text-base">₹{loan.amount}</td>
                   <td className="px-3 sm:px-4 py-3 border-b text-sm sm:text-base">{loan.term}</td>
                   <td className="px-3 sm:px-4 py-3 border-b">
                     <span
