@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import LoanForm from '../components/LoanForm';
 import { useNavigate } from 'react-router-dom';
+import LoanForm from './LoanForm';
 
 const Dashboard = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

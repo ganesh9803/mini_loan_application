@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import API from '../services/api';
+import axios from "axios";
 
 const SignupForm = () => {
   const [username, setUsername] = useState('');
@@ -22,7 +22,7 @@ const SignupForm = () => {
     e.preventDefault();
 
     try {
-      const response = await API.post('/users/signup', { username, email, password, role });
+      const response = await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/users/signup', { username, email, password, role });
       console.log('Signup Response:', response);
       setMessage(response?.data?.message || 'Signup successful');
       // Redirect to login page after successful signup

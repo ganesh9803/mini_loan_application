@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import API from '../services/api';
+import axios from "axios";
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -20,7 +20,7 @@ const LoginForm = () => {
     e.preventDefault();
 
     try {
-      const response = await API.post('/users/login', { email, password });
+      const response = await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/users/login', { email, password });
       localStorage.setItem('token', response.data.token); // Store JWT in localStorage
       localStorage.setItem('role', response.data.role); // Store role in localStorage
       navigate('/home'); // Redirect to the dashboard after successful login

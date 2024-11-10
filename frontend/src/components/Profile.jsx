@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import API from '../services/api'; // Assuming API utility is set up to make requests
+import axios from "axios";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -7,7 +7,12 @@ const Profile = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await API.get('/users/profile');
+        const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+        if (!token) throw new Error('No token found');
+
+        const response = await axios.get(import.meta.env.VITE_BACKEND_URL + '/api/users/profile', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setUser(response.data);
       } catch (error) {
         console.error('Error fetching profile:', error.response?.data.message || error.message);

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import API from '../services/api';
+import axios from "axios";
 import PropTypes from 'prop-types';
 
 const RepaymentForm = ({ loanId, repayments, onRepaymentSuccess }) => {
@@ -16,7 +16,11 @@ const RepaymentForm = ({ loanId, repayments, onRepaymentSuccess }) => {
     }
 
     try {
-      const response = await API.post(`/loans/${loanId}/repay`, { amount });
+      const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+        if (!token) throw new Error('No token found');
+      const response = await axios.post(import.meta.env.VITE_BACKEND_URL + `/api/loans/${loanId}/repay`, { amount }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setMessage(response.data.message);
       setAmount(''); // Reset amount after successful repayment
       onRepaymentSuccess && onRepaymentSuccess();

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import API from '../services/api';
+import axios from "axios";
 
 const AdminLoanList = () => {
   const [loans, setLoans] = useState([]);
@@ -7,7 +7,11 @@ const AdminLoanList = () => {
   useEffect(() => {
     const fetchLoans = async () => {
       try {
-        const response = await API.get('/loans/all');
+        const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+        if (!token) throw new Error('No token found')
+        const response = await axios.get(import.meta.env.VITE_BACKEND_URL +'/api/loans/all',{
+          headers: { Authorization: `Bearer ${token}` },
+        }); 
         console.log('Loans Data:', response.data);
         setLoans(response.data);
       } catch (error) {
@@ -20,7 +24,15 @@ const AdminLoanList = () => {
 
   const approveLoan = async (loanId) => {
     try {
-      await API.patch(`/loans/${loanId}/approve`);
+      const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+        if (!token) throw new Error('No token found')
+          await axios.patch(
+            import.meta.env.VITE_BACKEND_URL + `/api/loans/${loanId}/approve`,
+            {}, // Empty body for PATCH request
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
       setLoans(loans.map((loan) => loan._id === loanId ? { ...loan, status: 'APPROVED' } : loan));
     } catch (error) {
       console.error(error.response?.data?.message);

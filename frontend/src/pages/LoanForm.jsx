@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import API from '../services/api';
+import axios from "axios";
 
 const LoanForm = () => {
   const [amount, setAmount] = useState('');
@@ -34,7 +34,11 @@ const LoanForm = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await API.post('/loans', { amount, term });
+      const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+      if (!token) throw new Error('No token found')
+      const response = await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/loans/add', { amount, term }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setMessage(response.data.message);
       setAmount('');
       setTerm('');

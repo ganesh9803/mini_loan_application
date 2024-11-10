@@ -5,8 +5,8 @@ import { checkAdmin, authenticate } from '../middlewares/auth.js';
 const router = express.Router();
 
 // User routes
-router.post('/', authenticate, createLoan); // Only authenticated users can create loans
-router.get('/', authenticate, getLoans); // Only authenticated users can get their loans
+router.post('/add', authenticate, createLoan); // Only authenticated users can create loans
+router.get('/get', authenticate, getLoans); // Only authenticated users can get their loans
 
 // Admin routes
 router.get('/all', checkAdmin, getAllLoans); // Admin can view all loans

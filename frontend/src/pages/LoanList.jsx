@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import API from '../services/api';
+import axios from "axios";
 import RepaymentForm from '../components/RepaymentForm';
 
 
@@ -15,7 +15,11 @@ const LoanList = () => {
 
   const fetchLoans = async () => {
     try {
-      const response = await API.get('/loans');
+      const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+        if (!token) throw new Error('No token found')
+      const response = await axios.get(import.meta.env.VITE_BACKEND_URL +'/api/loans/get', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setLoans(response.data);
     } catch (error) {
       setMessage(`Error fetching loans: ${error.message}`);

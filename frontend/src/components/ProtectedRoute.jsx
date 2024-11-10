@@ -1,6 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import PropTypes from 'prop-types'; // Import PropTypes
 
+
 const ProtectedRoute = ({ allowedRoles }) => {
   const token = localStorage.getItem('token');
   const role = localStorage.getItem('role');
